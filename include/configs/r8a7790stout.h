@@ -1,8 +1,10 @@
 /*
- * include/configs/lager.h
- *     This file is lager board configuration.
+ * include/configs/r8a7790stout.h
+ *     This file is r8a7790-stout board configuration.
  *
- * Copyright (C) 2013-2014 Renesas Electronics Corporation
+ * Copyright (C) 2015 Renesas Electronics Europe GmbH
+ * Copyright (C) 2015 Renesas Electronics Corporation
+ * Copyright (C) 2015 Cogent Embedded, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2
@@ -18,22 +20,22 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef __LAGER_H
-#define __LAGER_H
+#ifndef __R8A7790STOUT_H
+#define __R8A7790STOUT_H
 
 #undef DEBUG
 #define CONFIG_ARMV7
 #define CONFIG_R8A7790
 #define CONFIG_RMOBILE
-#define CONFIG_RMOBILE_BOARD_STRING "Lager Board\n"
+#define CONFIG_RMOBILE_BOARD_STRING "R8A7790-stout board\n"
 #define CONFIG_SH_GPIO_PFC
 #define CONFIG_SYS_THUMB_BUILD
-#define CONFIG_MACH_LAGER
+#define CONFIG_MACH_R8A7790STOUT
 
 #include <asm/arch/rmobile.h>
 
-#define	CONFIG_CMD_EDITENV
-#define	CONFIG_CMD_SAVEENV
+#define CONFIG_CMD_EDITENV
+#define CONFIG_CMD_SAVEENV
 #define CONFIG_CMD_MEMORY
 #define CONFIG_CMD_DFL
 #define CONFIG_CMD_SDRAM
@@ -54,13 +56,13 @@
 #define CONFIG_CMD_SF
 #define CONFIG_CMD_SPI
 
-#define	CONFIG_CMDLINE_TAG
-#define	CONFIG_SETUP_MEMORY_TAGS
-#define	CONFIG_INITRD_TAG
-#define	CONFIG_CMDLINE_EDITING
+#define CONFIG_CMDLINE_TAG
+#define CONFIG_SETUP_MEMORY_TAGS
+#define CONFIG_INITRD_TAG
+#define CONFIG_CMDLINE_EDITING
 
 #define CONFIG_OF_LIBFDT
-#define BOARD_LATE_INIT
+#define CONFIG_BOARD_LATE_INIT
 
 #define CONFIG_BAUDRATE		38400
 #define CONFIG_BOOTDELAY	3
@@ -83,14 +85,14 @@
 #else
 #define CONFIG_SYS_INIT_SP_ADDR		0xE827FFFC
 #endif
-#define STACK_AREA_SIZE				0xC000
+#define STACK_AREA_SIZE			0xC000
 #define LOW_LEVEL_MERAM_STACK	\
 		(CONFIG_SYS_INIT_SP_ADDR + STACK_AREA_SIZE - 4)
 
 /* MEMORY */
-#define LAGER_SDRAM_BASE	0x40000000
-#define LAGER_SDRAM_SIZE	0x80000000
-#define LAGER_UBOOT_SDRAM_SIZE	0x20000000
+#define R8A7790STOUT_SDRAM_BASE	0x40000000
+#define R8A7790STOUT_SDRAM_SIZE	0x40000000
+#define R8A7790STOUT_UBOOT_SDRAM_SIZE	0x20000000
 
 #define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_PROMPT		"=> "
@@ -103,21 +105,22 @@
 /* SCIF */
 #define CONFIG_SCIF_CONSOLE
 #define CONFIG_CONS_SCIF0
-#define CONFIG_SCIF_USE_EXT_CLK
-#define SCIF0_BASE		0xe6e60000
+/* #define CONFIG_SCIF_USE_EXT_CLK */
+#define SCIF0_BASE		0xE6C40000
+#define CONFIG_SCIF_A
 #undef	CONFIG_SYS_CONSOLE_INFO_QUIET
 #undef	CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
 #undef	CONFIG_SYS_CONSOLE_ENV_OVERWRITE
 
-#define CONFIG_SYS_MEMTEST_START	(LAGER_SDRAM_BASE)
+#define CONFIG_SYS_MEMTEST_START	(R8A7790STOUT_SDRAM_BASE)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
 					 504 * 1024 * 1024)
 #undef	CONFIG_SYS_ALT_MEMTEST
 #undef	CONFIG_SYS_MEMTEST_SCRATCH
 #undef	CONFIG_SYS_LOADS_BAUD_CHANGE
 
-#define CONFIG_SYS_SDRAM_BASE		(LAGER_SDRAM_BASE)
-#define CONFIG_SYS_SDRAM_SIZE		(LAGER_UBOOT_SDRAM_SIZE)
+#define CONFIG_SYS_SDRAM_BASE		(R8A7790STOUT_SDRAM_BASE)
+#define CONFIG_SYS_SDRAM_SIZE		(R8A7790STOUT_UBOOT_SDRAM_SIZE)
 #define CONFIG_SYS_LOAD_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x7fc0)
 #define CONFIG_NR_DRAM_BANKS		1
 
@@ -153,8 +156,6 @@
 	"bootm_low=0x40e00000\0" \
 	"bootm_size=0x100000\0" \
 
-/* network */
-#define CONFIG_NFS_TIMEOUT 10000UL
 /* SH Ether */
 #define	CONFIG_NET_MULTI
 #define CONFIG_SH_ETHER
@@ -169,8 +170,8 @@
 #define CONFIG_BITBANGMII_MULTI
 
 /* Board Clock */
-#define	CONFIG_SYS_CLK_FREQ	10000000
-#define	CONFIG_SCIF_CLK_FREQ	14745600
+#define CONFIG_SYS_CLK_FREQ	10000000
+#define CONFIG_SCIF_CLK_FREQ	52000000 /* MP clock */
 #define CONFIG_SYS_TMU_CLK_DIV	4
 #define CONFIG_SYS_HZ		1000
 
@@ -181,23 +182,18 @@
 /* FS */
 #define CONFIG_DOS_PARTITION
 #define CONFIG_SUPPORT_VFAT
+#define CONFIG_NFS_TIMEOUT	10000UL
 
 /* USB */
 #define CONFIG_USB_STORAGE
 #define CONFIG_USB_EHCI
 #define CONFIG_USB_EHCI_R8A779x
-#define CONFIG_USB_MAX_CONTROLLER_COUNT        3
-
-/* MMCIF */
-#define CONFIG_MMC			1
-#define CONFIG_GENERIC_MMC		1
-
-#define CONFIG_SH_MMCIF			1
-#define CONFIG_SH_MMCIF_ADDR		0xee220000	/* ch1 */
-#define CONFIG_SH_MMCIF_CLK		48000000
-#define CONFIG_SH_MMCIF_FREQ		100000000
+#define CONFIG_USB_MAX_CONTROLLER_COUNT	3
+#define CONFIG_USB_PHY_RMOBILE
 
 /* SD */
+#define CONFIG_MMC			1
+#define CONFIG_GENERIC_MMC		1
 #define CONFIG_SH_SDHI			1
 #define CONFIG_SH_SDHI_FREQ		97500000
 #define CONFIG_MMC_SH_SDHI_NR_CHANNEL	4
@@ -207,4 +203,4 @@
 #define CONFIG_USB_HOST_ETHER   /* Enable USB Ethernet adapters */
 #define CONFIG_USB_ETHER_ASIX   /* Asix, or whatever driver(s) you want */
 
-#endif	/* __LAGER_H */
+#endif	/* __R8A7790STOUT_H */
