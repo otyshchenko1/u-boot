@@ -87,6 +87,15 @@ void __secure psci_system_reset(u32 function_id)
 	debug_puth(get_current_cpu());
 	debug_puts("\n");
 
+	for (int i = 0; i < R8A7790_PSCI_NR_CPUS; i++) {
+		debug_puts("CPU");
+		debug_puth(i);
+		if (r8a7790_apmu_power_off_poll(i))
+			debug_puts(" is in CoreStandby Mode\n");
+		else
+			debug_puts(" is in Run Mode\n");
+	}
+
 	r8a7790_system_reset();
 
 	/* Drain the WB before WFI */

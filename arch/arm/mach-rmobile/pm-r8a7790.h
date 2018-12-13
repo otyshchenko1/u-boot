@@ -12,6 +12,7 @@
 
 void r8a7790_apmu_power_on(u32 cpu);
 void r8a7790_apmu_power_off(u32 cpu);
+int r8a7790_apmu_power_off_poll(u32 cpu);
 void r8a7790_assert_reset(u32 cpu);
 void r8a7790_deassert_reset(u32 cpu);
 

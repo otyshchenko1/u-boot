@@ -31,6 +31,9 @@
 #define CPUNCR_OFFS(n)	(0x100 + (0x10 * (n)))
 
 #define CPUPWR_STANDBY	0x3
+#define CPUST_STANDBY	0x3
+
+#define CPUNST(r, n)	(((r) >> (n * 4)) & 3)	/* CPUn Status Bit */
 
 /*****************************************************************************
  * RST definitions
@@ -160,6 +163,68 @@ void __secure r8a7790_apmu_power_off(u32 cpu)
 
 	/* Request Core Standby for next WFI */
 	writel(CPUPWR_STANDBY, apmu_base + CPUNCR_OFFS(r8a7790_core_id(cpu)));
+}
+
+/*
+ * The realization of __mdelay() based on arch timer is borrowed from:
+ *    arch/arm/cpu/armv7/sunxi/psci.c
+ */
+#define __COUNTER_FREQUENCY	10000000
+#define ONE_MS (__COUNTER_FREQUENCY / 1000)
+
+static void __secure cp15_write_cntp_tval(u32 val)
+{
+	asm volatile ("mcr p15, 0, %0, c14, c2, 0" : : "r" (val));
+}
+
+static void __secure cp15_write_cntp_ctl(u32 val)
+{
+	asm volatile ("mcr p15, 0, %0, c14, c2, 1" : : "r" (val));
+}
+
+static u32 __secure cp15_read_cntp_ctl(void)
+{
+	u32 val;
+
+	asm volatile ("mrc p15, 0, %0, c14, c2, 1" : "=r" (val));
+
+	return val;
+}
+
+static void __secure __mdelay(u32 ms)
+{
+	u32 reg = ONE_MS * ms;
+
+	cp15_write_cntp_tval(reg);
+	isb();
+	cp15_write_cntp_ctl(3);
+
+	do {
+		isb();
+		reg = cp15_read_cntp_ctl();
+	} while (!(reg & BIT(2)));
+
+	cp15_write_cntp_ctl(0);
+	isb();
+}
+
+int __secure r8a7790_apmu_power_off_poll(u32 cpu)
+{
+	u32 cluster = r8a7790_cluster_id(cpu);
+	u32 apmu_base;
+	int i;
+
+	apmu_base = cluster == 0 ? CA15_APMU_BASE : CA7_APMU_BASE;
+
+	for (i = 0; i < 1000; i++) {
+		if (CPUNST(readl(apmu_base + PSTR_OFFS),
+				r8a7790_core_id(cpu)) == CPUST_STANDBY)
+			return 1;
+
+		__mdelay(1);
+	}
+
+	return 0;
 }
 
 void __secure r8a7790_assert_reset(u32 cpu)
