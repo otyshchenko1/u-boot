@@ -52,4 +52,7 @@
 #define CONFIG_SH_SCIF_CLK_FREQ		65000000
 #endif
 
+/* The PERIPHBASE in the CBAR register is wrong, so override it */
+#define CONFIG_ARM_GIC_BASE_ADDRESS		0xf1000000
+
 #endif	/* __LAGER_H */

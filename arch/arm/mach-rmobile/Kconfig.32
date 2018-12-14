@@ -65,6 +65,8 @@ config TARGET_LAGER
 	select SUPPORT_SPL
 	select USE_TINY_PRINTF
 	select SPL_TINY_MEMSET
+	select CPU_V7_HAS_NONSEC
+	select CPU_V7_HAS_VIRT
 
 config TARGET_KZM9G
 	bool "KZM9D board"
@@ -100,6 +102,8 @@ config TARGET_STOUT
 	select SUPPORT_SPL
 	select USE_TINY_PRINTF
 	select SPL_TINY_MEMSET
+	select CPU_V7_HAS_NONSEC
+	select CPU_V7_HAS_VIRT
 
 endchoice
 
