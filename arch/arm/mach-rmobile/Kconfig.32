@@ -78,6 +78,7 @@ config TARGET_LAGER
 	imply CMD_DM
 	select CPU_V7_HAS_NONSEC
 	select CPU_V7_HAS_VIRT
+	select ARCH_SUPPORT_PSCI
 
 config TARGET_KZM9G
 	bool "KZM9D board"
@@ -119,6 +120,7 @@ config TARGET_STOUT
 	imply CMD_DM
 	select CPU_V7_HAS_NONSEC
 	select CPU_V7_HAS_VIRT
+	select ARCH_SUPPORT_PSCI
 
 endchoice
 
