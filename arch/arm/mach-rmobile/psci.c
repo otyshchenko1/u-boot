@@ -14,6 +14,7 @@
 #include <asm/secure.h>
 
 #include "pm-r8a7790.h"
+#include "debug.h"
 
 #define GICC_CTLR_OFFSET	0x2000
 
@@ -24,12 +25,24 @@ u32 __secure psci_get_cpu_id(void)
 
 u32 __secure psci_version(void)
 {
+	debug_puts("[U-Boot PSCI]  psci_version: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts("\n");
+
 	return ARM_PSCI_VER_1_0;
 }
 
 int __secure psci_cpu_on(u32 function_id, u32 mpidr, u32 entry_point)
 {
 	u32 cpu = mpidr_to_cpu(mpidr);
+
+	debug_puts("[U-Boot PSCI]  psci_cpu_on: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts(", mpidr=");
+	debug_puth(mpidr);
+	debug_puts(", entry_point=");
+	debug_puth(entry_point);
+	debug_puts("\n");
 
 	psci_save_target_pc(cpu, entry_point);
 
@@ -43,6 +56,10 @@ int __secure psci_cpu_on(u32 function_id, u32 mpidr, u32 entry_point)
 void __secure psci_cpu_off(void)
 {
 	u32 cpu = get_current_cpu();
+
+	debug_puts("[U-Boot PSCI]  psci_cpu_off: cpu=");
+	debug_puth(cpu);
+	debug_puts("\n");
 
 	/*
 	 * Place the CPU interface in a state where it can never make a CPU exit
@@ -66,6 +83,10 @@ void __secure psci_cpu_off(void)
 
 void __secure psci_system_reset(u32 function_id)
 {
+	debug_puts("[U-Boot PSCI]  psci_system_reset: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts("\n");
+
 	r8a7790_system_reset();
 
 	/* Drain the WB before WFI */
@@ -78,6 +99,10 @@ void __secure psci_system_reset(u32 function_id)
 
 void __secure psci_system_off(u32 function_id)
 {
+	debug_puts("[U-Boot PSCI]  psci_system_off: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts("\n");
+
 	/* Drain the WB before WFI */
 	dsb();
 
