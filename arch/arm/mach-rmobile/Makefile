@@ -13,3 +13,9 @@ obj-$(CONFIG_SH73A0) += lowlevel_init.o cpu_info-sh73a0.o pfc-sh73a0.o
 obj-$(CONFIG_R8A7740) += lowlevel_init.o cpu_info-r8a7740.o pfc-r8a7740.o
 obj-$(CONFIG_RCAR_GEN2) += lowlevel_init_ca15.o cpu_info-rcar.o
 obj-$(CONFIG_RCAR_GEN3) += lowlevel_init_gen3.o cpu_info-rcar.o memmap-gen3.o
+
+ifndef CONFIG_SPL_BUILD
+ifdef CONFIG_R8A7790
+obj-$(CONFIG_ARMV7_PSCI) += psci.o pm-r8a7790.o
+endif
+endif
