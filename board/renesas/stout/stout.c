@@ -77,6 +77,53 @@ int board_early_init_f(void)
 	return 0;
 }
 
+#ifdef CONFIG_ARMV7_NONSEC
+#define TIMER_BASE		0xE6080000
+#define TIMER_CNTCR		0x00
+#define TIMER_CNTFID0	0x20
+
+/*
+ * Taking into the account that arch timer is only configurable in secure mode
+ * and we are going to enter kernel/hypervisor in a non-secure mode, update
+ * arch timer right now to avoid possible issues. Make sure arch timer is
+ * enabled and configured to use proper frequency.
+ */
+static void rcar_gen2_timer_init(void)
+{
+	u32 freq = RMOBILE_XTAL_CLK / 2;
+
+	/*
+	 * Update the arch timer if it is either not running, or is not at the
+	 * right frequency.
+	 */
+	if ((readl(TIMER_BASE + TIMER_CNTCR) & 1) == 0 ||
+			readl(TIMER_BASE + TIMER_CNTFID0) != freq) {
+		/* Update registers with correct frequency */
+		writel(freq, TIMER_BASE + TIMER_CNTFID0);
+		asm volatile("mcr p15, 0, %0, c14, c0, 0" : : "r" (freq));
+
+		/* Make sure arch timer is started by setting bit 0 of CNTCR */
+		writel(1, TIMER_BASE + TIMER_CNTCR);
+	}
+}
+
+/*
+ * In order not to break compilation if someone decides to build with PSCI
+ * support disabled, keep these dummy functions.
+ */
+void smp_set_core_boot_addr(unsigned long addr, int corenr)
+{
+}
+
+void smp_kick_all_cpus(void)
+{
+}
+
+void smp_waitloop(unsigned previous_address)
+{
+}
+#endif
+
 #define ETHERNET_PHY_RESET	123	/* GPIO 3 31 */
 
 int board_init(void)
@@ -91,6 +138,10 @@ int board_init(void)
 	gpio_direction_output(ETHERNET_PHY_RESET, 0);
 	mdelay(20);
 	gpio_direction_output(ETHERNET_PHY_RESET, 1);
+
+#ifdef CONFIG_ARMV7_NONSEC
+	rcar_gen2_timer_init();
+#endif
 
 	return 0;
 }
