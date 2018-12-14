@@ -55,4 +55,6 @@
 /* The PERIPHBASE in the CBAR register is wrong, so override it */
 #define CONFIG_ARM_GIC_BASE_ADDRESS		0xf1000000
 
+#define CONFIG_ARMV7_PSCI_1_0
+
 #endif	/* __LAGER_H */
