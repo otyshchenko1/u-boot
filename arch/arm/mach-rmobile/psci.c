@@ -14,6 +14,7 @@
 #include <asm/secure.h>
 
 #include "pm-r8a7790.h"
+#include "debug.h"
 
 #define R8A7790_PSCI_NR_CPUS	8
 #if R8A7790_PSCI_NR_CPUS > CONFIG_ARMV7_PSCI_NR_CPUS
@@ -105,6 +106,16 @@ int __secure psci_cpu_on(u32 function_id, u32 target_cpu, u32 entry_point,
 {
 	int cpu;
 
+	debug_puts("[U-Boot PSCI]  psci_cpu_on: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts(", target_cpu=");
+	debug_puth(target_cpu);
+	debug_puts(", entry_point=");
+	debug_puth(entry_point);
+	debug_puts(", context_id=");
+	debug_puth(context_id);
+	debug_puts("\n");
+
 	cpu = mpidr_to_cpu_index(target_cpu);
 	if (cpu == -1)
 		return ARM_PSCI_RET_INVAL;
@@ -130,6 +141,10 @@ int __secure psci_cpu_off(void)
 {
 	int cpu = get_current_cpu();
 
+	debug_puts("[U-Boot PSCI]  psci_cpu_off: cpu=");
+	debug_puth(cpu);
+	debug_puts("\n");
+
 	/*
 	 * Place the CPU interface in a state where it can never make a CPU exit
 	 * WFI as result of an asserted interrupt.
@@ -154,6 +169,10 @@ int __secure psci_cpu_off(void)
 
 void __secure psci_system_reset(u32 function_id)
 {
+	debug_puts("[U-Boot PSCI]  psci_system_reset: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts("\n");
+
 	r8a7790_system_reset();
 
 	/* Drain the WB before WFI */
@@ -166,6 +185,10 @@ void __secure psci_system_reset(u32 function_id)
 
 void __secure psci_system_off(u32 function_id)
 {
+	debug_puts("[U-Boot PSCI]  psci_system_off: cpu=");
+	debug_puth(get_current_cpu());
+	debug_puts("\n");
+
 	/* Drain the WB before WFI */
 	dsb();
 
