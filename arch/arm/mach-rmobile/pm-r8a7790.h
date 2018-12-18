@@ -10,6 +10,7 @@
 
 void r8a7790_apmu_power_on(int cpu);
 void r8a7790_apmu_power_off(int cpu);
+int r8a7790_apmu_power_off_poll(int cpu);
 void r8a7790_assert_reset(int cpu);
 void r8a7790_deassert_reset(int cpu);
 
